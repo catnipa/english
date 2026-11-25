@@ -2,8 +2,16 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>데일리 외신 영어</title>
+<meta name="theme-color" content="#1f4fd1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="외신영어">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <style>
 /* Layout: one reading column; sticky tabs; cards only for passages, feedback and report blocks. Works offline (system fonts). */
 :root{
@@ -100,6 +108,52 @@ th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line)} th{fo
 @keyframes sp{to{transform:rotate(360deg)}} @media (prefers-reduced-motion:reduce){.spin{animation:none}}
 .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;font-size:14px;z-index:20}
 @media (max-width:480px){article{padding:16px} article h2{font-size:23px} article p,.ptext{font-size:17px} .types .tr{grid-template-columns:100px 1fr 26px}}
+
+/* ---- mobile ---- */
+html{-webkit-text-size-adjust:100%}
+.wrap{padding-left:max(16px, env(safe-area-inset-left));padding-right:max(16px, env(safe-area-inset-right))}
+.ptext,.ver,article p,.rt,.word b,.x{overflow-wrap:anywhere}
+nav button .ic{display:none}
+@media (max-width:700px){
+  body{font-size:16px}
+  header{padding-top:max(12px, env(safe-area-inset-top));gap:8px}
+  h1{font-size:22px}
+  .bar{gap:6px}
+  .bar select{flex:1;min-width:0;font-size:16px;min-height:40px}
+  .bar .btn{min-height:40px}
+  #fetchState{flex-basis:100%;font-size:12px}
+  nav{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:20;padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+      background:var(--card);border-top:1px solid var(--line);border-bottom:0;gap:2px;overflow:visible;
+      box-shadow:0 -2px 12px rgba(0,0,0,.06)}
+  nav button{min-width:0;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;border-radius:10px}
+  nav button .ic{display:block;font-size:19px;line-height:1}
+  nav button[aria-selected=true]{background:var(--accent-soft);color:var(--accent)}
+  body.typing nav{display:none}
+  main{padding-top:14px;padding-bottom:calc(84px + env(safe-area-inset-bottom));gap:14px}
+  .wrap{padding-bottom:0}
+  .card,article{padding:14px;border-radius:12px}
+  article h2{font-size:22px} article .dek{font-size:16px}
+  article p,.ptext{font-size:17px;line-height:1.65}
+  .ptitle{font-size:20px}
+  .btn{min-height:44px;padding:10px 14px;font-size:15px}
+  .btn.small{min-height:38px;padding:7px 12px;font-size:14px}
+  textarea{font-size:16px;min-height:150px}
+  select,input{font-size:16px}
+  ol.rank li{grid-template-columns:26px 1fr}
+  ol.rank .sc{grid-column:2;text-align:left;margin-top:2px}
+  ol.rank .sc br{display:none}
+  ol.rank .sc span.sep{display:inline}
+  .scores{grid-template-columns:repeat(2,1fr)}
+  .score.total{grid-column:1/-1}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .types .tr{grid-template-columns:92px 1fr 26px}
+  .word{grid-template-columns:1fr}
+  .word .row{justify-content:flex-start}
+  .q .row{position:sticky;bottom:calc(76px + env(safe-area-inset-bottom));background:var(--card);padding:6px 0;z-index:2}
+  body.typing .q .row{bottom:0}
+  .toast{bottom:calc(90px + env(safe-area-inset-bottom));max-width:calc(100vw - 32px)}
+  table{font-size:13px}
+}
 </style>
 </head>
 <body>
@@ -113,11 +167,11 @@ th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line)} th{fo
     </div>
   </header>
   <nav role="tablist">
-    <button data-tab="brief" aria-selected="true">브리핑</button>
-    <button data-tab="practice" aria-selected="false">지문·영작</button>
-    <button data-tab="words" aria-selected="false">단어장</button>
-    <button data-tab="report" aria-selected="false">리포트</button>
-    <button data-tab="settings" aria-selected="false">설정</button>
+    <button data-tab="brief" aria-selected="true"><span class="ic" aria-hidden="true">📰</span>브리핑</button>
+    <button data-tab="practice" aria-selected="false"><span class="ic" aria-hidden="true">✍️</span>지문·영작</button>
+    <button data-tab="words" aria-selected="false"><span class="ic" aria-hidden="true">📚</span>단어장</button>
+    <button data-tab="report" aria-selected="false"><span class="ic" aria-hidden="true">📈</span>리포트</button>
+    <button data-tab="settings" aria-selected="false"><span class="ic" aria-hidden="true">⚙️</span>설정</button>
   </nav>
   <main id="main"><p class="muted">불러오는 중…</p></main>
 </div>
@@ -301,7 +355,7 @@ function vBrief(){
   let h = `<section class="card"><div class="sec">오늘의 순위 · 기사 ${d.n_items}건 → 이야기 ${d.stories.length}+개</div>
   <ol class="rank">${d.stories.slice(0, 10).map(s => `<li><span class="rn">${s.rank}</span><div><div class="rt">${esc(s.title)}</div>
     <div class="chips" style="margin-top:4px"><span class="chip o">${esc(CAT_KO[s.category] || s.category)}</span>${s.outlets.map(o => `<span class="chip">${esc(o)}</span>`).join("")}</div></div>
-    <div class="sc">${s.score.toFixed(1)}점<br>${s.score_parts.outlets}개 매체 · ${s.score_parts.articles}건</div></li>`).join("")}</ol>
+    <div class="sc">${s.score.toFixed(1)}점<br><span class="sep" style="display:none"> · </span>${s.score_parts.outlets}개 매체 · ${s.score_parts.articles}건</div></li>`).join("")}</ol>
   <details style="margin-top:8px"><summary class="muted" style="font-size:13px;cursor:pointer">순위는 어떻게 정하나요?</summary><p class="muted" style="font-size:13px;margin:6px 0 0">같은 사건을 다룬 기사들을 단어 겹침(TF-IDF 코사인 유사도)으로 묶은 뒤, 점수 = 3×보도한 매체 수 + 1×log(기사 수+1) + 2×피드 상단 노출 정도 + 1.5×최신성(12시간 반감) + 관심 분야 가중치. 가중치는 config.json에서 바꿀 수 있어요.</p></details></section>`;
   if (g){
     h += `<article><div class="row" style="justify-content:space-between"><span class="sec" style="margin:0;color:var(--accent)">Daily World Briefing</span>${listen("brief")}</div>
@@ -474,7 +528,7 @@ document.addEventListener("click", async e => {
     else if (id.startsWith("imp-")){ const at = S.day.answers[id.slice(4)]; speak(at[at.length - 1].feedback.improved); }
   }
 });
-document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => { S.tab = b.dataset.tab; if (b.dataset.tab === "report") S.report = null; render(); }));
+document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => { window.scrollTo(0, 0); S.tab = b.dataset.tab; if (b.dataset.tab === "report") S.report = null; render(); }));
 document.addEventListener("input", e => { if (e.target.dataset.k) S.drafts[e.target.dataset.k] = e.target.value; });
 document.addEventListener("change", async e => {
   const t = e.target;
@@ -487,6 +541,12 @@ document.addEventListener("change", async e => {
 });
 $("#fetchBtn").addEventListener("click", async () => { for (const k in FULL) delete FULL[k]; await loadState(); await loadDay(); render(); toast("최신 데이터를 확인했어요."); });
 
+
+/* mobile: hide the bottom tab bar while the keyboard is open */
+document.addEventListener("focusin", e => { if (e.target.matches("textarea, input[type=text]")) document.body.classList.add("typing"); });
+document.addEventListener("focusout", e => { if (e.target.matches("textarea, input[type=text]")) setTimeout(() => { if (!document.activeElement || !document.activeElement.matches("textarea, input[type=text]")) document.body.classList.remove("typing"); }, 150); });
+
+if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
 (async () => {
   const h0 = location.hash.slice(1); if (["brief","practice","words","report","settings"].includes(h0)) S.tab = h0;
   await loadState(); await loadDay(); render();
