@@ -210,11 +210,10 @@ def cosine(a, b):
 
 
 def clean_html(s):
+    import html as _html
     s = re.sub(r"<[^>]+>", " ", s or "")
-    s = (s.replace("&nbsp;", " ").replace("&amp;", "&").replace("&quot;", '"').replace("&#39;", "'")
-          .replace("&lt;", "<").replace("&gt;", ">").replace("&rsquo;", "’").replace("&lsquo;", "‘")
-          .replace("&ldquo;", "“").replace("&rdquo;", "”").replace("&mdash;", "—").replace("&ndash;", "–"))
-    s = re.sub(r"&#(\d+);", lambda m: chr(int(m.group(1))), s)
+    for _ in range(2):  # some feeds escape twice (&amp;apos;)
+        s = _html.unescape(s)
     return re.sub(r"\s+", " ", s).strip()
 
 

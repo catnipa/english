@@ -54,7 +54,7 @@ def main():
                                   offline=bool(offline))
 
     # keep the top stories with trimmed article text, so the browser can rebuild passages for other settings
-    day["stories"] = day["stories"][:15]
+    day["stories"] = day["stories"][:30]
     for s in day["stories"]:
         for art in s["articles"]:
             art["body"] = truncate_words(art.get("body") or "", 400)
