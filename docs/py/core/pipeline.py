@@ -25,9 +25,14 @@ def make_passages(day, settings, user_g=None):
     n, m = int(settings["passages"]), int(settings["questions"])
     length = LENGTH_WORDS.get(settings.get("length", "medium"), 170)
     user_g = user_g or {}
+    # go down the ranking; a story whose feeds give too little text for a passage is skipped
+    # (while enough other stories remain), so every passage is long enough to study
+    built = [(s, digest.build_passage(s, length)) for s in day["stories"][:max(n * 5, 25)]]
+    enough = [b for b in built if len(b[1]["text"].split()) >= min(50, length * 0.4)]
+    chosen = enough[:n] if len(enough) >= n else (enough + [b for b in built if b not in enough])[:n]
+    chosen.sort(key=lambda b: b[0]["rank"])
     out = []
-    for s in day["stories"][:n]:
-        p = digest.build_passage(s, length)
+    for s, p in chosen:
         v = vocab.extract([(s["id"], p["text"])], user_g, max_items=6)
         out.append({"story_id": s["id"], "title": s["title"], "category": s["category"], "outlets": s["outlets"],
                     "rank": s["rank"], "text": p["text"], "sources": p["sources"], "short": p["short"],
