@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: "5 22 * * *"   # 매일 22:05 UTC = 한국 시간 07:05 (GitHub 사정으로 몇 분~수십 분 늦어질 수 있음)
   workflow_dispatch: {}     # Actions 탭에서 'Run workflow'로 바로 실행
+  push:                     # 설정 파일을 고치면 바로 다시 수집
+    branches: [main]
+    paths: [".github/workflows/daily.yml", "config.json", "my_glossary.tsv", "build_site.py", "core/**"]
 
 permissions:
   contents: write
