@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>데일리 외신 영어</title>
+<style>
+/* Layout: one reading column; sticky tabs; cards only for passages, feedback and report blocks. Works offline (system fonts). */
+:root{
+  --paper:#f4f6f9; --card:#ffffff; --ink:#131821; --muted:#5a6472; --line:#dbe0e8;
+  --accent:#1f4fd1; --accent-soft:#e7eeff; --mark:#fff0b3;
+  --good:#127452; --good-soft:#e2f4ec; --bad:#b3401a; --bad-soft:#fbe9e2;
+  --serif: Georgia, "Times New Roman", "Noto Serif KR", serif;
+  --sans: -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --paper:#0f131a; --card:#171c25; --ink:#e8ecf2; --muted:#9aa4b3; --line:#2a3240;
+  --accent:#7ea2ff; --accent-soft:#1c2740; --mark:#4a3f12; --good:#5fd3a2; --good-soft:#123326; --bad:#ff9b72; --bad-soft:#3a1f15;
+  color-scheme: dark;}}
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6}
+button,select,input,textarea{font:inherit;color:inherit}
+a{color:var(--accent)}
+.wrap{max-width:800px;margin:0 auto;padding:0 16px 80px}
+header{padding:18px 0 12px;border-bottom:2px solid var(--ink);display:flex;flex-direction:column;gap:10px}
+.brand{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+h1{font-family:var(--serif);font-size:27px;margin:0}
+.badge{font-size:12px;color:var(--good);background:var(--good-soft);padding:2px 8px;border-radius:99px}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+select,input[type=number]{padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+nav{position:sticky;top:0;z-index:5;background:var(--paper);display:flex;gap:4px;padding:8px 0;border-bottom:1px solid var(--line);overflow-x:auto}
+nav button{flex:1;white-space:nowrap;min-width:70px;padding:9px 8px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-weight:500;cursor:pointer}
+nav button[aria-selected=true]{background:var(--ink);color:var(--paper)}
+main{padding-top:18px;display:flex;flex-direction:column;gap:18px}
+.sec{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:4px 0 6px;font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-weight:500;font-size:14px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.small{padding:4px 10px;font-size:13px} .btn.ghost{background:transparent}
+.btn.rec{border-color:var(--bad);color:var(--bad)} .btn[disabled]{opacity:.5;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.muted{color:var(--muted)} .err{color:var(--bad);font-size:14px}
+.note{font-size:14px;color:var(--muted);border:1px dashed var(--line);border-radius:10px;padding:12px 14px;background:var(--card)}
+.log{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:var(--muted);white-space:pre-wrap;max-height:160px;overflow:auto}
+.chips{display:flex;gap:4px;flex-wrap:wrap}
+.chip{font-size:11px;padding:2px 7px;border-radius:99px;background:var(--accent-soft);color:var(--accent);font-weight:500}
+.chip.o{background:transparent;border:1px solid var(--line);color:var(--muted)}
+ol.rank{list-style:none;margin:0;padding:0}
+ol.rank li{display:grid;grid-template-columns:30px 1fr auto;gap:8px;padding:10px 0;border-top:1px solid var(--line);align-items:start}
+ol.rank li:first-child{border-top:0}
+.rn{font-family:var(--serif);font-weight:700;color:var(--accent);font-size:19px;font-variant-numeric:tabular-nums}
+.rt{font-weight:600;line-height:1.4}
+.sc{font-size:12px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+article{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px}
+article h2{font-family:var(--serif);font-size:28px;line-height:1.2;margin:6px 0 8px;text-wrap:balance}
+article .dek{font-family:var(--serif);font-size:18px;color:var(--muted);margin:0 0 14px}
+article h3{font-family:var(--serif);font-size:20px;margin:20px 0 6px}
+article p{font-family:var(--serif);font-size:18px;line-height:1.7;margin:0 0 12px;max-width:66ch}
+.src{font-size:12px;color:var(--muted);font-family:var(--sans)}
+.ptitle{font-family:var(--serif);font-size:22px;line-height:1.25;margin:6px 0}
+.ptext{font-family:var(--serif);font-size:18px;line-height:1.7}
+.vrow{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;margin:8px 0}
+.q{border-top:1px solid var(--line);margin-top:16px;padding-top:14px;display:flex;flex-direction:column;gap:8px}
+.qt{font-weight:600} .qn{color:var(--accent);margin-right:4px}
+.hint{font-size:14px;color:var(--muted);background:var(--paper);border-radius:8px;padding:8px 10px}
+textarea{width:100%;min-height:120px;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);line-height:1.55;resize:vertical}
+.live{font-size:14px;color:var(--muted);font-style:italic;min-height:1em}
+.fb{background:var(--paper);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.score{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.score.total{background:var(--accent-soft);border-color:transparent}
+.score .k{font-size:12px;color:var(--muted)} .score .v{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
+.meter{height:4px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:4px}.meter i{display:block;height:100%;background:var(--accent)}
+ul.corr{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+ul.corr li{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 12px}
+.co{background:var(--bad-soft);color:var(--bad);text-decoration:line-through;padding:0 3px;border-radius:3px}
+.c{background:var(--good-soft);color:var(--good);padding:0 3px;border-radius:3px;font-weight:500}
+.ty{font-size:11px;color:var(--muted);margin-left:6px;letter-spacing:.04em}
+.x{font-size:14px;margin-top:3px}
+.ver{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-family:var(--serif);font-size:17px}
+.tip{background:var(--mark);border-radius:8px;padding:10px 12px;font-size:15px}
+h5{margin:0;font-size:12px;color:var(--muted);letter-spacing:.06em}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.tile .k{font-size:12px;color:var(--muted)} .tile .v{font-size:25px;font-weight:600;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line)} th{font-weight:500;color:var(--muted);font-size:12px}
+.scroll{overflow-x:auto}
+.types .tr{display:grid;grid-template-columns:130px 1fr 30px;gap:8px;align-items:center;font-size:14px;margin:4px 0}
+.tb{height:10px;background:var(--line);border-radius:99px;overflow:hidden}.tb i{display:block;height:100%;background:var(--bad)}
+.chart svg text{fill:var(--muted);font-size:11px}
+.word{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:10px 0;border-top:1px solid var(--line)}
+.word:first-child{border-top:0}
+.word b{font-size:16px} .word .ex{font-size:14px;color:var(--muted);font-style:italic;grid-column:1/-1}
+.set{display:grid;gap:14px} .set label{display:flex;flex-direction:column;gap:4px;font-size:14px;font-weight:500}
+.set .h{font-weight:400;color:var(--muted);font-size:13px}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}} @media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;font-size:14px;z-index:20}
+@media (max-width:480px){article{padding:16px} article h2{font-size:23px} article p,.ptext{font-size:17px} .types .tr{grid-template-columns:100px 1fr 26px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><h1>데일리 외신 영어</h1><span class="badge">AI 미사용 · 규칙 기반</span></div>
+    <div class="bar">
+      <label for="dateSel">날짜</label><select id="dateSel"></select>
+      <button class="btn small" id="fetchBtn">새로고침</button>
+      <span id="fetchState"></span>
+    </div>
+  </header>
+  <nav role="tablist">
+    <button data-tab="brief" aria-selected="true">브리핑</button>
+    <button data-tab="practice" aria-selected="false">지문·영작</button>
+    <button data-tab="words" aria-selected="false">단어장</button>
+    <button data-tab="report" aria-selected="false">리포트</button>
+    <button data-tab="settings" aria-selected="false">설정</button>
+  </nav>
+  <main id="main"><p class="muted">불러오는 중…</p></main>
+</div>
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const S = {tab:"brief", state:null, date:null, day:null, report:null, words:null, drafts:{}, open:{}, hints:{}, busy:{}, err:{}, confirm:false};
+
+/* ---------- web version: no server. Data = static JSON built daily by GitHub Actions,
+   corrections & reports = the same Python code running in the browser (Pyodide), records = this browser. ---------- */
+const DEFAULTS = {passages:5, questions:2, length:"medium", answer_target:"medium", voice_input:true, tts_rate:1};
+const LS = {
+  get(k, d){ try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } }
+};
+const PYODIDE = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+const MODULES = ["__init__","textutil","glossary","rank","digest","vocab","questions","grammar","scoring","report","pipeline"];
+let PY = null;
+function loadScript(src){ return new Promise((ok, no) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => no(new Error("첨삭 엔진(Pyodide)을 내려받지 못했어요. 인터넷 연결을 확인하세요.")); document.head.appendChild(s); }); }
+function py(){
+  if (!PY) PY = (async () => {
+    toast("첨삭 엔진을 준비하는 중이에요. 처음 한 번만 10~30초 걸립니다.");
+    if (!window.loadPyodide) await loadScript(PYODIDE + "pyodide.js");
+    const pyo = await loadPyodide({indexURL: PYODIDE});
+    pyo.FS.mkdirTree("/app/core");
+    for (const m of MODULES){
+      const r = await fetch("py/core/" + m + ".py", {cache: "no-cache"});
+      if (!r.ok) throw new Error("py/core/" + m + ".py 파일이 없어요. build_site.py를 실행했는지 확인하세요.");
+      pyo.FS.writeFile("/app/core/" + m + ".py", await r.text());
+    }
+    pyo.runPython(`
+import sys, json
+sys.path.insert(0, "/app")
+from core import scoring, report, pipeline
+def _assess(text, p, q, mode, cfg, st):
+    return json.dumps(scoring.assess(text, json.loads(p), json.loads(q), mode, json.loads(cfg), json.loads(st)), ensure_ascii=False)
+def _report(a, d, s):
+    return json.dumps(report.build_report(json.loads(a), json.loads(d), json.loads(s)), ensure_ascii=False)
+_make = pipeline.js_make_passages
+`);
+    return pyo;
+  })().catch(e => { PY = null; throw e; });
+  return PY;
+}
+async function callPy(name, ...args){ const pyo = await py(); const f = pyo.globals.get(name); try { return JSON.parse(f(...args)); } finally { f.destroy(); } }
+async function getJSON(u){ const r = await fetch(u, {cache: "no-cache"}); if (!r.ok) throw new Error("데이터를 불러오지 못했어요 (" + r.status + ")"); return r.json(); }
+const FULL = {};
+async function fullDay(date){ if (!FULL[date]) FULL[date] = await getJSON("data/" + date + ".json"); return FULL[date]; }
+function dayView(full){
+  const custom = LS.get("nd_p_" + full.date, null);
+  const passages = custom ? custom.passages : full.passages, vocab = custom ? custom.vocab : full.vocab;
+  const grouped = {};
+  LS.get("nd_answers", []).filter(a => a.date === full.date).forEach(a => (grouped[`p${a.pi}q${a.qi}`] = grouped[`p${a.pi}q${a.qi}`] || []).push({id:a.id, text:a.text, mode:a.mode, feedback:a.feedback, at:a.created_at}));
+  const meta = LS.get("nd_days", {});
+  meta[full.date] = {date: full.date, passages: passages.map(p => ({questions: p.questions.map(() => ({}))}))};
+  LS.set("nd_days", meta);
+  return {...full, stories: full.stories_lite, passages, vocab, answers: grouped, settings_used: custom ? custom.settings_used : full.settings_used};
+}
+async function api(path, body){
+  const settings = {...DEFAULTS, ...LS.get("nd_settings", {})};
+  if (path === "/api/state"){
+    const idx = await getJSON("data/index.json").catch(() => ({days: [], updated: null}));
+    return {days: idx.days.map(d => d.date), updated: idx.updated, settings,
+            fetch: {running: false, log: [], error: null},
+            config: {daily_fetch_time: "매일 아침 7시경 (GitHub Actions)", languagetool: false,
+                     outlets: [...new Set(idx.days.flatMap(d => d.outlets))]}};
+  }
+  if (path.startsWith("/api/day")){
+    const date = new URL(path, location.href).searchParams.get("date");
+    return dayView(await fullDay(date));
+  }
+  if (path === "/api/answer"){
+    const v = dayView(await fullDay(body.date)), p = v.passages[body.pi], q = p.questions[body.qi];
+    const fb = await callPy("_assess", body.text, JSON.stringify(p), JSON.stringify(q), body.mode, JSON.stringify({checker: {}}), JSON.stringify(settings));
+    const all = LS.get("nd_answers", []), id = (all.length ? all[all.length - 1].id : 0) + 1;
+    all.push({id, date: body.date, pi: body.pi, qi: body.qi, question: q.q, qtype: q.type, passage_title: p.title, category: p.category,
+              text: body.text, mode: body.mode, feedback: fb, overall: fb.overall, created_at: new Date().toISOString()});
+    if (!LS.set("nd_answers", all)) throw new Error("브라우저 저장 공간이 부족해요. 설정 탭에서 백업한 뒤 기록을 정리하세요.");
+    return {id, feedback: fb};
+  }
+  if (path === "/api/report")
+    return callPy("_report", JSON.stringify(LS.get("nd_answers", [])), JSON.stringify(Object.values(LS.get("nd_days", {}))), JSON.stringify(settings));
+  if (path === "/api/words"){
+    let w = LS.get("nd_words", []);
+    if (body){
+      const {action, term} = body;
+      if (action === "star" && !w.some(x => x.term === term)) w.push({term, ko: body.ko, example: body.example, date: body.date, added_at: new Date().toISOString(), reviews: 0, known: 0});
+      if (action === "unstar") w = w.filter(x => x.term !== term);
+      if (action === "known" || action === "unknown") w = w.map(x => x.term === term ? {...x, known: action === "known" ? 1 : 0, reviews: x.reviews + 1} : x);
+      LS.set("nd_words", w);
+    }
+    return w.slice().sort((a, b) => a.known - b.known || (a.added_at < b.added_at ? 1 : -1));
+  }
+  if (path === "/api/settings"){ const s = {...LS.get("nd_settings", {}), ...body}; LS.set("nd_settings", s); return {...DEFAULTS, ...s}; }
+  if (path === "/api/regenerate"){
+    const full = await fullDay(body.date), g = await getJSON("data/glossary.json").catch(() => ({}));
+    const out = await callPy("_make", JSON.stringify(full), JSON.stringify(settings), JSON.stringify(g));
+    LS.set("nd_p_" + body.date, out);
+    LS.set("nd_answers", LS.get("nd_answers", []).filter(a => a.date !== body.date));
+    return dayView(full);
+  }
+  throw new Error("알 수 없는 요청");
+}
+function exportBackup(){
+  const data = {}; for (let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if (k.startsWith("nd_")) data[k] = localStorage.getItem(k); }
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify({app: "daily-news-english", saved: new Date().toISOString(), data})], {type: "application/json"}));
+  a.download = "news-english-backup-" + new Date().toISOString().slice(0, 10) + ".json";
+  document.body.appendChild(a); a.click(); a.remove();
+}
+async function importBackup(file){
+  try {
+    const j = JSON.parse(await file.text());
+    if (j.app !== "daily-news-english") throw new Error();
+    Object.entries(j.data).forEach(([k, v]) => localStorage.setItem(k, v));
+    toast("백업을 불러왔어요."); S.report = null; S.words = null; await loadState(); await loadDay(); render();
+  } catch(e){ toast("이 앱의 백업 파일이 아니에요."); }
+}
+
+const toast = m => { const t = document.createElement("div"); t.className = "toast"; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2800); };
+const fmt = d => { const [y,m,dd] = d.split("-").map(Number); return `${y}.${m}.${dd} (${"일월화수목금토"[new Date(y,m-1,dd).getDay()]})`; };
+const CAT_KO = {Markets:"시장·경제", Business:"기업·산업", Tech:"기술", Politics:"정치", World:"국제", Society:"사회"};
+
+/* ---------- speech (browser built-in) ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, recKey = null;
+function toggleMic(k){
+  if (!SR) return;
+  if (recKey === k){ rec.stop(); return; }
+  if (rec) rec.stop();
+  rec = new SR(); rec.lang = "en-US"; rec.continuous = true; rec.interimResults = true; recKey = k;
+  rec.onresult = e => {
+    let fin = "", inter = "";
+    for (let i = e.resultIndex; i < e.results.length; i++){ const t = e.results[i][0].transcript; if (e.results[i].isFinal) fin += t; else inter += t; }
+    if (fin){ S.drafts[k] = ((S.drafts[k] || "") + " " + fin.trim()).trim(); S.drafts[k + "_voice"] = true; const ta = document.getElementById("ta-" + k); if (ta) ta.value = S.drafts[k]; }
+    const lv = document.getElementById("live-" + k); if (lv) lv.textContent = inter;
+  };
+  rec.onerror = e => { toast(e.error === "not-allowed" ? "마이크 권한이 거부됐어요." : "음성 인식 오류: " + e.error); };
+  rec.onend = () => { recKey = null; rec = null; render(); };
+  rec.start(); render();
+}
+function speak(text){
+  if (!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text); u.lang = "en-US"; u.rate = Number(S.state.settings.tts_rate) || 1;
+  const v = speechSynthesis.getVoices().find(v => /en[-_]US/i.test(v.lang)); if (v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+const listen = (id) => window.speechSynthesis ? `<button class="btn small ghost" data-act="speak" data-id="${id}">▶ 듣기</button>` : "";
+
+/* ---------- data ---------- */
+async function loadState(){
+  S.state = await api("/api/state");
+  const sel = $("#dateSel");
+  sel.innerHTML = S.state.days.length ? S.state.days.map(d => `<option value="${d}"${d === S.date ? " selected" : ""}>${fmt(d)}</option>`).join("") : "<option>아직 없음</option>";
+  $("#fetchState").textContent = S.state.updated ? "마지막 갱신 " + S.state.updated.replace("T", " ").slice(0, 16) : "";
+  if (!S.date && S.state.days.length) S.date = S.state.days[0];
+}
+async function loadDay(){
+  S.day = null;
+  if (!S.date) return;
+  try { S.day = await api("/api/day?date=" + S.date); } catch(e){ S.day = null; }
+}
+/* ---------- views ---------- */
+function render(){
+  document.querySelectorAll("nav button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === S.tab)));
+  const m = $("#main");
+  if (S.tab === "settings") return m.innerHTML = vSettings();
+  if (S.tab === "report") return m.innerHTML = vReport();
+  if (S.tab === "words") return m.innerHTML = vWords();
+  if (!S.day) return m.innerHTML = vEmpty();
+  m.innerHTML = S.tab === "brief" ? vBrief() : vPractice();
+}
+function vEmpty(){
+  return `<div class="card"><p style="margin-top:0">아직 올라온 뉴스가 없어요.</p>
+  <p class="muted" style="font-size:14px;margin-bottom:0">GitHub 저장소의 <b>Actions</b> 탭 → <b>Daily news</b> → <b>Run workflow</b>를 한 번 눌러 주세요. 1~3분 뒤 이 페이지를 새로고침하면 오늘 뉴스가 보입니다. 그 뒤로는 매일 아침 자동으로 갱신돼요.</p></div>`;
+}
+function vBrief(){
+  const d = S.day, g = d.digest;
+  let h = `<section class="card"><div class="sec">오늘의 순위 · 기사 ${d.n_items}건 → 이야기 ${d.stories.length}+개</div>
+  <ol class="rank">${d.stories.slice(0, 10).map(s => `<li><span class="rn">${s.rank}</span><div><div class="rt">${esc(s.title)}</div>
+    <div class="chips" style="margin-top:4px"><span class="chip o">${esc(CAT_KO[s.category] || s.category)}</span>${s.outlets.map(o => `<span class="chip">${esc(o)}</span>`).join("")}</div></div>
+    <div class="sc">${s.score.toFixed(1)}점<br>${s.score_parts.outlets}개 매체 · ${s.score_parts.articles}건</div></li>`).join("")}</ol>
+  <details style="margin-top:8px"><summary class="muted" style="font-size:13px;cursor:pointer">순위는 어떻게 정하나요?</summary><p class="muted" style="font-size:13px;margin:6px 0 0">같은 사건을 다룬 기사들을 단어 겹침(TF-IDF 코사인 유사도)으로 묶은 뒤, 점수 = 3×보도한 매체 수 + 1×log(기사 수+1) + 2×피드 상단 노출 정도 + 1.5×최신성(12시간 반감) + 관심 분야 가중치. 가중치는 config.json에서 바꿀 수 있어요.</p></details></section>`;
+  if (g){
+    h += `<article><div class="row" style="justify-content:space-between"><span class="sec" style="margin:0;color:var(--accent)">Daily World Briefing</span>${listen("brief")}</div>
+      <h2>${esc(g.headline)}</h2><p class="dek">${esc(g.dek)}</p><p>${esc(g.overview)}</p>
+      ${g.sections.map(sec => `<h3>${esc(sec.subhead)}</h3>${sec.paragraphs.map(p => `<p>${esc(p.text)} <span class="src">— ${esc(p.outlets.join(", "))}</span></p>`).join("")}`).join("")}
+      ${g.watch_next.length ? `<h3>What to Watch</h3>${g.watch_next.map(w => `<p>• ${esc(w)}</p>`).join("")}` : ""}
+    </article>
+    <section class="card"><div class="sec">한눈에 보는 흐름</div><ul>${g.themes_ko.map(t => `<li>${esc(t)}</li>`).join("")}</ul><p class="muted" style="font-size:13px;margin-bottom:0">${esc(g.method_note)}</p></section>`;
+  }
+  h += `<section class="card"><div class="sec">원문 링크</div>${d.stories.slice(0, 8).map(s => `<div style="font-size:14px;margin:4px 0"><b>${s.rank}.</b> ${s.links.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.outlet)}</a>`).join(" · ")}</div>`).join("")}</section>`;
+  if (d.offline) h += `<div class="note">지금 보이는 건 예시(sample) 데이터예요. GitHub Actions가 한 번 실행되면 실제 뉴스로 바뀝니다.</div>`;
+  return h;
+}
+function vPractice(){
+  const d = S.day, st = S.state.settings;
+  const total = d.passages.reduce((a, p) => a + p.questions.length, 0);
+  const keys = Object.keys(d.answers || {});
+  const avg = keys.length ? (keys.reduce((a, k) => { const at = d.answers[k]; return a + at[at.length - 1].feedback.overall; }, 0) / keys.length).toFixed(1) : "–";
+  let h = `<div class="card"><div class="row" style="justify-content:space-between"><span>답변 <b>${keys.length}</b> / ${total} · 평균 <b>${avg}</b>점</span>
+    ${S.confirm ? `<span class="row"><span class="muted" style="font-size:13px">오늘 답변 기록이 지워져요.</span><button class="btn small" data-act="regen">새로 만들기</button><button class="btn small ghost" data-act="noregen">취소</button></span>`
+      : `<button class="btn small ghost" data-act="askregen">현재 설정(지문 ${st.passages}·질문 ${st.questions})으로 다시 만들기</button>`}</div></div>`;
+  const su = d.settings_used || {};
+  if (su.passages && (su.passages !== st.passages || su.questions !== st.questions || su.length !== st.length))
+    h += `<div class="note">지금 지문은 기본 설정(지문 ${su.passages}·질문 ${su.questions})으로 만들어졌어요. 내 설정으로 바꾸려면 위의 '다시 만들기'를 누르세요.</div>`;
+  d.passages.forEach((p, pi) => {
+    h += `<section class="card"><div class="row" style="justify-content:space-between"><div class="chips"><span class="chip o">지문 ${pi + 1} · ${p.rank}위</span><span class="chip o">${esc(CAT_KO[p.category] || p.category)}</span>${p.outlets.map(o => `<span class="chip">${esc(o)}</span>`).join("")}</div>${listen("p" + pi)}</div>
+      <div class="ptitle">${esc(p.title)}</div><div class="ptext">${esc(p.text)}</div>
+      <div class="src" style="margin-top:6px">본문 출처: ${esc(p.sources.join(", "))}${p.short ? " · 피드에 본문이 짧게만 있어 요약문으로 구성됨" : ""} ${p.links.map(l => `· <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.outlet)} 원문</a>`).join(" ")}</div>
+      ${p.vocab.length ? `<div class="vrow">${p.vocab.map(v => `<span><b>${esc(v.term)}</b> ${v.ko ? esc(v.ko) : `<a href="${esc(v.dict)}" target="_blank" rel="noopener">사전</a>`}</span>`).join("")}</div>` : ""}
+      ${p.questions.map((q, qi) => vQ(p, pi, q, qi)).join("")}</section>`;
+  });
+  return h;
+}
+function vQ(p, pi, q, qi){
+  const k = `p${pi}q${qi}`, at = (S.day.answers || {})[k], last = at ? at[at.length - 1] : null, on = recKey === k;
+  let h = `<div class="q"><div class="qt"><span class="qn">Q${qi + 1}.</span><span class="chip o" style="margin-right:6px">${esc(q.type_ko)}</span>${esc(q.q)}</div>`;
+  h += S.hints[k] ? `<div class="hint">💡 ${esc(q.hint_ko)}</div>` : `<div><button class="btn small ghost" data-act="hint" data-k="${k}">표현 힌트 보기</button></div>`;
+  if (last) h += vFb(last, k, at.length);
+  if (!last || S.open[k]){
+    h += `<textarea id="ta-${k}" data-k="${k}" placeholder="영어로 생각을 적거나 마이크 버튼을 눌러 말해 보세요.">${esc(S.drafts[k] || "")}</textarea>
+    <div class="live" id="live-${k}"></div>
+    <div class="row">${SR && S.state.settings.voice_input ? `<button class="btn${on ? " rec" : ""}" data-act="mic" data-k="${k}">${on ? "■ 말하기 끝" : "🎙 말로 답하기"}</button>` : ""}
+    <button class="btn primary" data-act="submit" data-pi="${pi}" data-qi="${qi}" ${S.busy[k] ? "disabled" : ""}>${last ? "다시 첨삭" : "첨삭 받기"}</button></div>`;
+  } else h += `<div><button class="btn small" data-act="rewrite" data-k="${k}">고쳐서 다시 쓰기</button></div>`;
+  if (S.err[k]) h += `<p class="err">${esc(S.err[k])}</p>`;
+  return h + `</div>`;
+}
+function vFb(a, k, n){
+  const f = a.feedback, sc = f.scores;
+  const m = (l, v) => `<div class="score"><div class="k">${l}</div><div class="v">${v}<span class="muted" style="font-size:12px">/10</span></div><div class="meter"><i style="width:${v * 10}%"></i></div></div>`;
+  const real = f.corrections.filter(c => c.category !== "style"), style = f.corrections.filter(c => c.category === "style");
+  const line = c => `<li>${c.original ? `<span class="co">${esc(c.original)}</span>` : ""}${c.corrected != null ? ` → <span class="c">${esc(c.corrected)}</span>` : ""}<span class="ty">${esc(c.type_ko)}</span><div class="x">${esc(c.explanation_ko)}</div></li>`;
+  return `<div class="fb">
+    <details><summary class="muted" style="font-size:14px;cursor:pointer">내 답변${n > 1 ? ` (${n}번째)` : ""} · ${a.mode === "voice" ? "음성" : "타이핑"}</summary><p style="margin:6px 0 0">${esc(a.text)}</p></details>
+    <div class="scores"><div class="score total"><div class="k">종합 · ${esc(f.cefr)}</div><div class="v">${f.overall}<span class="muted" style="font-size:12px">/10</span></div></div>${m("문법", sc.grammar)}${m("어휘", sc.vocabulary)}${m("자연스러움", sc.naturalness)}${m("내용", sc.content)}</div>
+    <p style="margin:0">${esc(f.summary_ko)}</p>
+    ${real.length ? `<h5>교정 ${real.length}건</h5><ul class="corr">${real.map(line).join("")}</ul>` : `<p class="muted" style="margin:0">규칙 검사에서 걸린 오류가 없어요.</p>`}
+    ${f.improved !== a.text ? `<div class="row" style="justify-content:space-between"><h5>교정한 답변</h5>${listen("imp-" + k)}</div><div class="ver">${esc(f.improved)}</div>` : ""}
+    ${style.length ? `<h5>더 나은 표현 제안</h5><ul class="corr">${style.map(line).join("")}</ul>` : ""}
+    ${f.polished ? `<h5>표현까지 다듬은 버전</h5><div class="ver">${esc(f.polished)}</div>` : ""}
+    ${f.better_expressions.length ? `<h5>다음에 써 볼 표현</h5><div class="vrow">${f.better_expressions.map(e => `<span><b>${esc(e.expression)}</b> ${esc(e.meaning_ko)}</span>`).join("")}</div>` : ""}
+    ${f.passage_words_to_try.length ? `<h5>지문 단어도 써 보세요</h5><div class="vrow">${f.passage_words_to_try.map(e => `<span><b>${esc(e.term)}</b> ${esc(e.ko)}</span>`).join("")}</div>` : ""}
+    <div class="tip"><b>팁</b> ${esc(f.tip_ko)}</div>
+    <div class="src">${esc(f.method)} · 연결어: ${esc(f.stats.connectors.join(", ") || "없음")} · 고급 어휘 비율 ${Math.round(f.stats.advanced_ratio * 100)}%</div>
+  </div>`;
+}
+function vWords(){
+  if (!S.words){ api("/api/words").then(w => { S.words = w; render(); }); return `<p class="muted"><span class="spin"></span></p>`; }
+  const starred = new Set(S.words.map(w => w.term));
+  let h = "";
+  if (S.day){
+    h += `<section class="card"><div class="sec">오늘의 단어·표현 ${S.day.vocab.length}개</div><p class="muted" style="font-size:13px;margin-top:0">기본 단어 목록에 없는 단어를 빈도·길이·여러 기사에 나온 정도로 점수를 매겨 골랐어요. 뜻은 내장 용어집(또는 my_glossary.tsv)에서 가져오고, 없으면 사전 링크를 보여 줍니다.</p>
+      ${S.day.vocab.map(v => `<div class="word"><div><b>${esc(v.term)}</b> <span class="muted" style="font-size:13px">${v.kind === "phrase" ? "표현" : "단어"} · ${v.count}회</span><br>${v.ko ? esc(v.ko) : `<a href="${esc(v.dict)}" target="_blank" rel="noopener">네이버 사전에서 뜻 보기</a>`}</div>
+      <div>${starred.has(v.term) ? `<button class="btn small" data-act="unstar" data-t="${esc(v.term)}">★ 저장됨</button>` : `<button class="btn small ghost" data-act="star" data-t="${esc(v.term)}">☆ 저장</button>`}</div>
+      <div class="ex">${esc(v.example)}</div></div>`).join("")}</section>`;
+  }
+  h += `<section class="card"><div class="sec">내 단어장 ${S.words.length}개 · 외운 단어 ${S.words.filter(w => w.known).length}개</div>
+    ${S.words.length ? S.words.map(w => `<div class="word"><div><b style="${w.known ? "opacity:.55" : ""}">${esc(w.term)}</b> <span class="muted" style="font-size:13px">${esc(w.date)}</span><br>${esc(w.ko || "")}</div>
+      <div class="row">${w.known ? `<button class="btn small ghost" data-act="unknown" data-t="${esc(w.term)}">다시 외우기</button>` : `<button class="btn small" data-act="known" data-t="${esc(w.term)}">외웠어요</button>`}<button class="btn small ghost" data-act="unstar" data-t="${esc(w.term)}">삭제</button></div>
+      <div class="ex">${esc(w.example || "")}</div></div>`).join("") : `<p class="muted">오늘의 단어에서 ☆를 눌러 저장하세요.</p>`}</section>`;
+  return h;
+}
+function chart(daily){
+  const L = daily.slice(-14); if (!L.length) return "";
+  const W = Math.max(320, L.length * 46 + 50), H = 190, pl = 30, pr = 14, pt = 16, pb = 34, iw = W - pl - pr, ih = H - pt - pb;
+  const maxQ = Math.max(4, ...L.map(d => d.answered)), x = i => pl + iw * (i + .5) / L.length, bw = Math.min(26, iw / L.length * .55);
+  let g = "";
+  [0, 5, 10].forEach(v => { const y = pt + ih - ih * v / 10; g += `<line x1="${pl}" x2="${W - pr}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${pl - 6}" y="${y + 4}" text-anchor="end">${v}</text>`; });
+  L.forEach((d, i) => { const hh = ih * d.answered / maxQ; g += `<rect x="${x(i) - bw / 2}" y="${pt + ih - hh}" width="${bw}" height="${hh}" rx="3" fill="var(--accent-soft)" stroke="var(--accent)" stroke-opacity=".35"/><text x="${x(i)}" y="${H - 18}" text-anchor="middle">${d.date.slice(5).replace("-", "/")}</text><text x="${x(i)}" y="${H - 5}" text-anchor="middle">${d.answered}문</text>`; });
+  const pts = L.map((d, i) => d.avg == null ? null : [x(i), pt + ih - ih * d.avg / 10, d.avg]).filter(Boolean);
+  if (pts.length){ g += `<polyline fill="none" stroke="var(--accent)" stroke-width="2.5" points="${pts.map(p => p[0] + "," + p[1]).join(" ")}"/>`; pts.forEach((p, i) => g += `<circle cx="${p[0]}" cy="${p[1]}" r="${i === pts.length - 1 ? 5 : 3.5}" fill="var(--card)" stroke="var(--accent)" stroke-width="2"/>`); const lp = pts[pts.length - 1]; g += `<text x="${lp[0]}" y="${lp[1] - 10}" text-anchor="middle" style="fill:var(--ink);font-weight:600">${lp[2].toFixed(1)}</text>`; }
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="날짜별 답변 수와 평균 점수">${g}</svg>`;
+}
+function vReport(){
+  if (!S.report){ api("/api/report").then(r => { S.report = r; render(); }); return `<p class="muted"><span class="spin"></span> 계산 중…</p>`; }
+  const R = S.report;
+  if (R.empty) return `<div class="note">아직 기록이 없어요. 지문·영작 탭에서 첫 답변을 첨삭받으면 리포트가 생깁니다.</div>`;
+  const KO = {grammar:"문법", vocabulary:"어휘", naturalness:"자연스러움", content:"내용"};
+  const T = R.error_types.slice(0, 8), tmax = T.length ? T[0][1] : 1;
+  const TK = {grammar:"문법",agreement:"수 일치",tense:"시제",article:"관사",preposition:"전치사",collocation:"연어",word_choice:"단어 선택",structure:"문장 구조",awkward:"어색한 표현",spelling:"철자",punctuation:"구두점",capitalization:"대문자",repetition:"반복"};
+  return `<section class="tiles">
+    <div class="tile"><div class="k">연속 학습</div><div class="v">${R.streak}일</div></div>
+    <div class="tile"><div class="k">최근 14일 중</div><div class="v">${R.active14}일</div></div>
+    <div class="tile"><div class="k">답변한 질문</div><div class="v">${R.answered_total}개</div></div>
+    <div class="tile"><div class="k">평균 점수</div><div class="v">${R.overall_avg.toFixed(1)}</div></div></section>
+  <section class="card"><div class="sec">영역별 평균</div><div class="scores">${Object.entries(R.sub_avg).map(([k, v]) => `<div class="score"><div class="k">${KO[k]}</div><div class="v">${v.toFixed(1)}</div><div class="meter"><i style="width:${v * 10}%"></i></div></div>`).join("")}</div></section>
+  <section class="card"><div class="sec">최근 14일 · 막대 = 답변 수, 선 = 평균 점수</div><div class="chart scroll">${chart(R.daily)}</div></section>
+  <section class="card"><div class="sec">날짜별 학습량</div><div class="scroll"><table><thead><tr><th>날짜</th><th>지문(읽음/전체)</th><th>질문(답변/전체)</th><th>시도</th><th>평균</th></tr></thead><tbody>
+    ${R.daily.slice().reverse().map(d => `<tr><td>${fmt(d.date)}</td><td>${d.passages_read} / ${d.passages_total || "–"}</td><td>${d.answered} / ${d.questions_total || "–"}</td><td>${d.attempts}</td><td>${d.avg == null ? "–" : d.avg.toFixed(1)}</td></tr>`).join("")}</tbody></table></div></section>
+  ${T.length ? `<section class="card"><div class="sec">자주 나온 오류</div><div class="types">${T.map(([t, c]) => `<div class="tr"><span>${esc(TK[t] || t)}</span><span class="tb"><i style="width:${c / tmax * 100}%"></i></span><span>${c}</span></div>`).join("")}</div></section>` : ""}
+  <section class="card"><div class="sec">분석과 학습 방향 (규칙 기반)</div>
+    <p><b>현재 수준</b><br>${esc(R.level_ko)}</p>
+    ${R.strengths_ko.length ? `<p><b>강점</b><br>${R.strengths_ko.map(esc).join(" · ")}</p>` : ""}
+    ${R.recurring_issues.length ? `<p style="margin-bottom:4px"><b>반복되는 실수</b></p><ul>${R.recurring_issues.map(i => `<li><b>${esc(i.pattern_ko)}</b>${i.examples.length ? `<br><span class="muted">예: ${i.examples.map(esc).join(" / ")}</span>` : ""}<br>${esc(i.fix_ko)}</li>`).join("")}</ul>` : ""}
+    <p><b>개선 방향</b><br>${esc(R.direction_ko)}</p>
+    <p style="margin-bottom:4px"><b>다음 7일 계획</b></p><ul>${R.plan.map(p => `<li>${esc(p)}</li>`).join("")}</ul>
+    <p style="margin-bottom:0"><b>설정 추천</b><br>${esc(R.settings_ko)}</p></section>`;
+}
+function vSettings(){
+  const s = S.state.settings, c = S.state.config;
+  const o = (vals, cur) => vals.map(([v, l]) => `<option value="${v}"${String(v) === String(cur) ? " selected" : ""}>${l}</option>`).join("");
+  return `<section class="card set">
+    <label>하루 지문 수<span class="h">바꾼 뒤 '다시 만들기'를 누르거나 다음 수집부터 적용돼요.</span><select data-set="passages">${o([1,2,3,4,5,6,7,8,9,10].map(n => [n, n + "개"]), s.passages)}</select></label>
+    <label>지문당 질문 수<select data-set="questions">${o([1,2,3,4,5].map(n => [n, n + "개"]), s.questions)}</select></label>
+    <label>지문 길이<select data-set="length">${o([["short","짧게 (약 120단어)"],["medium","보통 (약 170단어)"],["long","길게 (약 240단어)"]], s.length)}</select></label>
+    <label>답변 목표 분량<span class="h">내용 점수의 분량 기준이에요.</span><select data-set="answer_target">${o([["short","50단어"],["medium","70단어"],["long","100단어"]], s.answer_target)}</select></label>
+    <label>말로 답하기 버튼<span class="h">브라우저 내장 음성 인식을 씁니다. Chrome에서는 음성이 Google 서버의 음성 인식으로 처리돼요(이 부분만 기계학습 기반).</span><select data-set="voice_input">${o([[true,"보이기"],[false,"숨기기"]], s.voice_input)}</select></label>
+    <label>읽어 주기 속도<select data-set="tts_rate">${o([[0.8,"0.8x"],[0.9,"0.9x"],[1,"1.0x"],[1.15,"1.15x"],[1.3,"1.3x"]], s.tts_rate)}</select></label>
+  </section>
+  <section class="card set"><div class="sec" style="margin:0">기록 백업</div>
+    <p class="muted" style="font-size:13px;margin:0">답변·점수·단어장은 이 브라우저에만 저장돼요. 다른 기기로 옮기거나 브라우저 데이터를 지우기 전에 백업하세요.</p>
+    <div class="row"><button class="btn" data-act="export">백업 파일 내려받기</button>
+    <label class="btn ghost" style="flex-direction:row;font-weight:500">백업 불러오기<input type="file" id="importFile" accept="application/json" style="display:none"></label></div></section>
+  <section class="note">뉴스 갱신: ${esc(c.daily_fetch_time)} · 수집 매체: ${esc(c.outlets.join(", ") || "아직 없음")}<br>
+  첨삭·리포트는 이 페이지 안에서 규칙 기반 Python 코드로 계산돼요(AI 미사용). 처음 첨삭할 때 엔진을 한 번 내려받습니다(약 10MB).</section>`;
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", async e => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const a = b.dataset.act, k = b.dataset.k;
+  if (a === "export") return exportBackup();
+  if (a === "hint"){ S.hints[k] = true; return render(); }
+  if (a === "mic") return toggleMic(k);
+  if (a === "rewrite"){ S.open[k] = true; const at = S.day.answers[k]; if (!S.drafts[k]) S.drafts[k] = at[at.length - 1].text; return render(); }
+  if (a === "askregen"){ S.confirm = true; return render(); }
+  if (a === "noregen"){ S.confirm = false; return render(); }
+  if (a === "regen"){ S.confirm = false; $("#main").insertAdjacentHTML("afterbegin", `<p class="muted"><span class="spin"></span> 지문을 다시 만드는 중…</p>`); try { S.day = await api("/api/regenerate", {date: S.date}); S.report = null; toast("지문을 다시 만들었어요."); } catch(err){ toast(err.message); } return render(); }
+  if (a === "submit"){
+    const pi = +b.dataset.pi, qi = +b.dataset.qi, key = `p${pi}q${qi}`, text = (S.drafts[key] || "").trim();
+    if (!text) return toast("답을 먼저 입력하거나 말해 주세요.");
+    if (recKey === key && rec) rec.stop();
+    S.busy[key] = true; S.err[key] = null; render();
+    try {
+      const r = await api("/api/answer", {date: S.date, pi, qi, text, mode: S.drafts[key + "_voice"] ? "voice" : "typed"});
+      (S.day.answers[key] = S.day.answers[key] || []).push({id: r.id, text, mode: S.drafts[key + "_voice"] ? "voice" : "typed", feedback: r.feedback});
+      S.drafts[key] = ""; S.drafts[key + "_voice"] = false; S.open[key] = false; S.report = null;
+    } catch(err){ S.err[key] = err.message; }
+    S.busy[key] = false; return render();
+  }
+  if (["star","unstar","known","unknown"].includes(a)){
+    const t = b.dataset.t, v = (S.day?.vocab || []).find(x => x.term === t) || {};
+    S.words = await api("/api/words", {action: a, term: t, ko: v.ko || "", example: v.example || "", date: S.date});
+    return render();
+  }
+  if (a === "speak"){
+    const id = b.dataset.id;
+    if (id === "brief"){ const g = S.day.digest; speak([g.headline, g.overview, ...g.sections.flatMap(s => s.paragraphs.map(p => p.text))].join(" ")); }
+    else if (id.startsWith("p")){ const p = S.day.passages[+id.slice(1)]; speak(p.title + ". " + p.text); }
+    else if (id.startsWith("imp-")){ const at = S.day.answers[id.slice(4)]; speak(at[at.length - 1].feedback.improved); }
+  }
+});
+document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => { S.tab = b.dataset.tab; if (b.dataset.tab === "report") S.report = null; render(); }));
+document.addEventListener("input", e => { if (e.target.dataset.k) S.drafts[e.target.dataset.k] = e.target.value; });
+document.addEventListener("change", async e => {
+  const t = e.target;
+  if (t.id === "importFile" && t.files[0]) return importBackup(t.files[0]);
+  if (t.id === "dateSel"){ S.date = t.value; await loadDay(); return render(); }
+  if (t.dataset.set){
+    let v = t.value; if (["passages","questions"].includes(t.dataset.set)) v = +v; if (t.dataset.set === "tts_rate") v = +v; if (t.dataset.set === "voice_input") v = v === "true";
+    S.state.settings = await api("/api/settings", {[t.dataset.set]: v}); toast("저장했어요.");
+  }
+});
+$("#fetchBtn").addEventListener("click", async () => { for (const k in FULL) delete FULL[k]; await loadState(); await loadDay(); render(); toast("최신 데이터를 확인했어요."); });
+
+(async () => {
+  const h0 = location.hash.slice(1); if (["brief","practice","words","report","settings"].includes(h0)) S.tab = h0;
+  await loadState(); await loadDay(); render();
+})();
+</script>
+</body>
+</html>
